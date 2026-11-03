@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FFF8F0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>빵지순례 & 도보 다이어트 | 뚜벅이 베이커리 투어</title>
+  
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Fallback Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top App Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="logo-emoji">🥐</span>
+        <div>
+          <h1>빵지순례 뚜벅이</h1>
+          <p class="subtitle">먹은 만큼 걷는 스마트 베이커리 투어</p>
+        </div>
+      </div>
+      <button id="btnGps" class="gps-btn" title="내 위치 가져오기">
+        <span class="icon">📍</span>
+        <span class="text">내 위치</span>
+      </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="content-body">
+      <!-- 1. 지역 및 핫플 선택 섹션 -->
+      <section class="card section-location">
+        <div class="section-title">
+          <span class="badge">STEP 1</span>
+          <h2>출발 지역 설정</h2>
+        </div>
+        
+        <div class="hotspot-chips" id="hotspotChips">
+          <button class="chip active" data-region="성수동" data-lat="37.5446" data-lng="127.0560">성수동 핫플</button>
+          <button class="chip" data-region="연남동" data-lat="37.5620" data-lng="126.9248">연남·홍대</button>
+          <button class="chip" data-region="익선동" data-lat="37.5742" data-lng="126.9897">익선·을지로</button>
+          <button class="chip" data-region="한남동" data-lat="37.5348" data-lng="127.0016">한남·이태원</button>
+          <button class="chip" data-region="판교" data-lat="37.3948" data-lng="127.1119">판교 백현동</button>
+        </div>
+
+        <div class="search-input-box">
+          <input type="text" id="customLocationInput" placeholder="직접 지역/지하철역 입력 (예: 강남역, 송리단길)" />
+          <button id="btnSearchLocation" class="search-btn">탐색</button>
+        </div>
+      </section>
+
+      <!-- 2. 테마 및 빵 메뉴(칼로리) 선택 -->
+      <section class="card section-theme">
+        <div class="section-title">
+          <span class="badge">STEP 2</span>
+          <h2>오늘 먹을 빵 & 테마</h2>
+        </div>
+
+        <!-- 테마 탭 -->
+        <div class="theme-grid">
+          <div class="theme-card active" data-theme="saltbread">
+            <span class="emoji">🧈</span>
+            <span class="name">버터·소금빵</span>
+            <span class="desc">고소 짭짤 겉바속촉</span>
+          </div>
+          <div class="theme-card" data-theme="cake">
+            <span class="emoji">🍰</span>
+            <span class="name">디저트·케이크</span>
+            <span class="desc">달콤한 힐링 코스</span>
+          </div>
+          <div class="theme-card" data-theme="bagel">
+            <span class="emoji">🥯</span>
+            <span class="name">쫄깃 베이글</span>
+            <span class="desc">든든한 브런치</span>
+          </div>
+          <div class="theme-card" data-theme="croissant">
+            <span class="emoji">🥐</span>
+            <span class="name">페이스트리</span>
+            <span class="desc">결이 살아있는 크루아상</span>
+          </div>
+        </div>
+
+        <!-- 칼로리 바구니 계산기 -->
+        <div class="bakery-cart">
+          <div class="cart-header">
+            <h3>오늘 먹을(먹은) 디저트 바구니</h3>
+            <span class="item-count" id="cartCount">1개 선택됨</span>
+          </div>
+          <div class="menu-tags" id="menuTags">
+            <!-- JS 동적 생성 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 칼로리 밸런스 위젯 -->
+      <section class="card calorie-dashboard">
+        <div class="stat-grid">
+          <div class="stat-box intake">
+            <span class="label">섭취 예정 칼로리</span>
+            <div class="value-wrap">
+              <span class="number" id="intakeKcal">330</span>
+              <span class="unit">kcal</span>
+            </div>
+            <span class="hint">🥐 소금빵 1개</span>
+          </div>
+
+          <div class="stat-box burn">
+            <span class="label">목표 도보 소모</span>
+            <div class="value-wrap">
+              <span class="number" id="targetWalkMin">75</span>
+              <span class="unit">분</span>
+            </div>
+            <span class="hint" id="targetDistanceKm">약 4.5 km 걷기</span>
+          </div>
+        </div>
+
+        <!-- 프로그레스 바 -->
+        <div class="calorie-progress-container">
+          <div class="progress-info">
+            <span>도보 코스 소모율</span>
+            <strong id="burnRatio">0%</strong>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+          </div>
+          <p class="burn-tip" id="burnTip">코스를 생성하면 도보 소모 칼로리와 최적 동선이 계산됩니다!</p>
+        </div>
+
+        <button id="btnGenerateCourse" class="cta-generate-btn">
+          ✨ 뚜벅이 맞춤 코스 만들기
+        </button>
+      </section>
+
+      <!-- 4. 인터랙티브 지도 및 코스 결과 -->
+      <section class="card section-result" id="resultSection" style="display: none;">
+        <div class="section-title">
+          <span class="badge highlight">READY</span>
+          <h2>추천 빵지순례 코스 동선</h2>
+        </div>
+
+        <!-- 지도 뷰포트 -->
+        <div class="map-wrapper">
+          <div id="kakaoMap" class="map-view"></div>
+          <div id="mapNotice" class="map-notice" style="display: none;">
+            <span>💡 고화질 벡터 지도 로드됨</span>
+          </div>
+        </div>
+
+        <!-- 코스 요약 배지 -->
+        <div class="course-summary-banner" id="courseSummary">
+          <div class="summary-item">
+            <span class="sub">총 도보 거리</span>
+            <strong id="totalWalkDist">- km</strong>
+          </div>
+          <div class="divider"></div>
+          <div class="summary-item">
+            <span class="sub">예상 걷는 시간</span>
+            <strong id="totalWalkTime">- 분</strong>
+          </div>
+          <div class="divider"></div>
+          <div class="summary-item highlight">
+            <span class="sub">도보 소모량</span>
+            <strong id="totalBurnKcal">- kcal</strong>
+          </div>
+        </div>
+
+        <!-- 타임라인 동선 카드 목록 -->
+        <div class="timeline-route" id="timelineRoute">
+          <!-- JS 동적 주입 -->
+        </div>
+      </section>
+
+      <!-- 5. 모바일 접속 안내 & API 설정 모달 토글 -->
+      <footer class="app-footer">
+        <p class="dev-info">카카오맵 MCP 기반 • 뚜벅이 다이어트 플래너</p>
+        <button id="btnOpenSetting" class="subtle-link">⚙️ 카카오 API 키 / 모바일 접속 안내</button>
+      </footer>
+    </main>
+
+    <!-- 모바일 접속 안내 & 설정 모달 -->
+    <div class="modal-overlay" id="settingModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📱 모바일 기기 접속 및 설정</h3>
+          <button id="btnCloseModal" class="btn-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="info-block">
+            <h4>1. 내 스마트폰(아이폰/갤럭시)에서 열기</h4>
+            <p>같은 Wi-Fi(공유기)에 연결된 스마트폰 브라우저에서 아래 주소로 접속하세요:</p>
+            <div class="ip-box" id="mobileIpBox">
+              <code>http://192.168.0.34:8080</code>
+              <button id="btnCopyUrl" class="btn-copy">복사</button>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <h4>2. 카카오 JavaScript API 키 상태</h4>
+            <div class="api-key-view">
+              <span class="key-label">등록된 키:</span>
+              <code id="displayApiKey">50063a8e157ba699f0b650abe0496c3b</code>
+            </div>
+            <p class="key-tip">
+              * 카카오 지도 SDK는 등록된 도메인(예: <code>http://localhost:8080</code>, <code>http://192.168.0.34:8080</code>)에서만 SDK가 허용됩니다.<br>
+              * 도메인 불일치 에러 시에도 앱이 중단되지 않도록 <strong>자체 인터랙티브 지도와 카카오맵 모바일 길찾기 바로가기</strong>가 100% 정상 작동하도록 폴백(Fallback) 모드가 내장되어 있습니다!
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnConfirmModal" class="btn-primary-small">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet Fallback JS (도메인 제한 없는 오픈소스 지도) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Main App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
