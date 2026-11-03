@@ -48,13 +48,43 @@
           <button class="chip active" data-region="성수동" data-lat="37.5446" data-lng="127.0560">성수동 핫플</button>
           <button class="chip" data-region="연남동" data-lat="37.5620" data-lng="126.9248">연남·홍대</button>
           <button class="chip" data-region="익선동" data-lat="37.5742" data-lng="126.9897">익선·을지로</button>
+          <button class="chip" data-region="망원동" data-lat="37.5563" data-lng="126.9038">망원동 망리단길</button>
+          <button class="chip" data-region="송리단길" data-lat="37.5115" data-lng="127.1085">잠실 송리단길</button>
           <button class="chip" data-region="한남동" data-lat="37.5348" data-lng="127.0016">한남·이태원</button>
           <button class="chip" data-region="판교" data-lat="37.3948" data-lng="127.1119">판교 백현동</button>
+          <button class="chip" data-region="강남역" data-lat="37.4979" data-lng="127.0276">강남·신사</button>
         </div>
 
         <div class="search-input-box">
-          <input type="text" id="customLocationInput" placeholder="직접 지역/지하철역 입력 (예: 강남역, 송리단길)" />
+          <input type="text" id="customLocationInput" placeholder="직접 지역/지하철역 입력 (예: 강남역, 송리단길, 망원동)" />
           <button id="btnSearchLocation" class="search-btn">탐색</button>
+        </div>
+
+        <!-- 실시간 자동 계산 출발점 & 도착점 프리뷰 카드 -->
+        <div class="auto-route-preview" id="autoRoutePreview">
+          <div class="preview-header">
+            <span class="preview-tag">자동 매칭 동선</span>
+            <span class="preview-region-name" id="previewRegionName">성수동 기준</span>
+          </div>
+          <div class="preview-points">
+            <div class="point-row start">
+              <span class="badge-icon start">🚩 출발점</span>
+              <div class="point-info">
+                <strong id="previewStartName">자연도소금빵 성수점</strong>
+                <span class="point-desc" id="previewStartDesc">1차 빵지순례 명소</span>
+              </div>
+            </div>
+            <div class="point-flow-arrow">
+              <span>⇣ 도보 중간 코스 연결</span>
+            </div>
+            <div class="point-row end">
+              <span class="badge-icon end">🏁 도착점</span>
+              <div class="point-info">
+                <strong id="previewEndName">밀도 성수본점</strong>
+                <span class="point-desc" id="previewEndDesc">최종 완주 & 휴식 스팟</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -145,6 +175,24 @@
         <div class="section-title">
           <span class="badge highlight">READY</span>
           <h2>추천 빵지순례 코스 동선</h2>
+        </div>
+
+        <!-- 출발-도착 하이라이트 배너 -->
+        <div class="route-highlight-card">
+          <div class="highlight-main">
+            <div class="h-col">
+              <span class="h-label start">🚩 출발지</span>
+              <strong class="h-val" id="hlStartName">자연도소금빵 성수점</strong>
+            </div>
+            <div class="h-arrow">➡️</div>
+            <div class="h-col">
+              <span class="h-label end">🏁 도착지</span>
+              <strong class="h-val" id="hlEndName">밀도 성수본점</strong>
+            </div>
+          </div>
+          <a href="#" id="btnKakaoTotalRoute" target="_blank" class="btn-total-route">
+            <span>🗺️</span> 카카오맵에서 [출발 ➡️ 도착] 전체 도보 길찾기 열기
+          </a>
         </div>
 
         <!-- 지도 뷰포트 -->
